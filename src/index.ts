@@ -40,85 +40,84 @@ const getScriptChildren = (
   } = option;
   const ms = typeof polling === 'number' ? polling : 1000 * 60;
   const funcStr = `
-      (() => {
-        let htmlVersion;
-        ${once ? `let alreadyShowConfirm = false;` : ''}
-        ${polling ? `let timer;` : ''}
-        const checkHtmlVersion = () => {
-          const url = \`${versionUrl}?t=\${Date.now()}\`;
-          fetch(url)
-            .then(res => res.text())
-            .then(version => {
-              if (!version) return;
-              if (!htmlVersion) {
-                htmlVersion = version;
-                return;
+      let htmlVersion;
+      ${once ? `let alreadyShowConfirm = false;` : ''}
+      ${polling ? `let timer;` : ''}
+      const checkHtmlVersion = () => {
+        const url = \`${versionUrl}?t=\${Date.now()}\`;
+        fetch(url)
+          .then(res => res.text())
+          .then(version => {
+            if (!version) return;
+            if (!htmlVersion) {
+              htmlVersion = version;
+              return;
+            }
+            ${once ? `if (alreadyShowConfirm) return;` : ''}
+            if (version !== htmlVersion) {
+              ${once ? `alreadyShowConfirm = true;` : ''}
+              // eslint-disable-next-line no-alert
+              if (window.confirm('请求资源已更新，请刷新页面')) {
+                window.location.reload();
+              } else {
+                // eslint-disable-next-line no-use-before-define
+                removeEvent();
               }
-              ${once ? `if (alreadyShowConfirm) return;` : ''}
-              if (version !== htmlVersion) {
-                ${once ? `alreadyShowConfirm = true;` : ''}
-                // eslint-disable-next-line no-alert
-                if (window.confirm('请求资源已更新，请刷新页面')) {
-                  window.location.reload();
-                } else {
-                  // eslint-disable-next-line no-use-before-define
-                  removeEvent();
-                }
-              }
-            });
-        };
+            }
+          });
+      };
+      ${
+        onerror
+          ? `function errorListener(event) {
+        const error = event.reason || event;
+        const source = event.target || event.srcElement;
+        if (error.message?.includes('Loading chunk') ||
+            source instanceof HTMLScriptElement ||
+            source instanceof HTMLLinkElement) {
+          checkHtmlVersion();
+        }
+      }`
+          : ''
+      }
+      function removeEvent() {
         ${
-          onerror
-            ? `function errorListener(event) {
-          const error = event.reason || event;
-          const source = event.target || event.srcElement;
-          if (error.message?.includes('Loading chunk') ||
-              source instanceof HTMLScriptElement ||
-              source instanceof HTMLLinkElement) {
-            checkHtmlVersion();
-          }
-        }`
+          onvisibilitychange
+            ? `document.removeEventListener('visibilitychange', checkHtmlVersion);`
             : ''
         }
-        function removeEvent() {
-          ${
-            onvisibilitychange
-              ? `document.removeEventListener('visibilitychange', checkHtmlVersion);`
-              : ''
+        ${
+          onerror
+            ? `window.removeEventListener('error', errorListener, true);`
+            : ''
+        }
+        ${polling ? `window.clearInterval(timer);` : ''}
+      };
+      function addEvent() {
+        ${
+          onvisibilitychange
+            ? `document.addEventListener('visibilitychange', () => {
+          if (!document.hidden) {
+            checkHtmlVersion();
           }
-          ${
-            onerror
-              ? `window.removeEventListener('error', errorListener, true);`
-              : ''
-          }
-          ${polling ? `window.clearInterval(timer);` : ''}
-        };
-        function addEvent() {
-          ${
-            onvisibilitychange
-              ? `document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) {
-              checkHtmlVersion();
-            }
-          });`
-              : ''
-          }
-          ${
-            onerror
-              ? `window.addEventListener('error', errorListener, true);`
-              : ''
-          }
-          ${
-            polling
-              ? `timer = setInterval(() => {
-              if (document.hidden) return;
-              checkHtmlVersion();
-            }, ${ms});`
-              : ''
-          }
-        };
-        addEvent()
-      })();
+        });`
+            : ''
+        }
+        ${
+          onerror
+            ? `window.addEventListener('error', errorListener, true);`
+            : ''
+        }
+        ${
+          polling
+            ? `timer = setInterval(() => {
+            if (document.hidden) return;
+            checkHtmlVersion();
+          }, ${ms});`
+            : ''
+        }
+      };
+      checkHtmlVersion();
+      addEvent();
     `.replace(/^\s*[\r\n]/gm, '');
   return `\n${funcStr}`;
 };
@@ -135,6 +134,7 @@ const htmlAutoReload = (option: HtmlAutoReloadOption = {}): Plugin => {
       return [
         {
           tag: 'script',
+          attrs: { type: 'module', defer: true },
           children: getScriptChildren(config, option),
           injectTo: 'body',
         },
