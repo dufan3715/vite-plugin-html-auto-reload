@@ -1,15 +1,15 @@
 # vite-plugin-html-auto-reload
-a vite plugin to build with version and do auto reload html on version change
+一个用于构建时生成版本号并在版本变更时自动刷新 HTML 的 Vite 插件
 
 <p align="center">
   <strong>
-    <span>English</span>
+    <a href="./README.md">English</a>
     |
-    <a href="./README.zh-CN.md">简体中文</a>
+    <span>简体中文</span>
   </strong>
 </p>
 
-## Install
+## 安装
 
 ```sh
 # pnpm
@@ -20,7 +20,7 @@ yarn add -D vite-plugin-html-auto-reload
 npm i -D vite-plugin-html-auto-reload
 ```
 
-## Usage
+## 使用方法
 
 ```ts
 // vite.config.js
@@ -39,23 +39,23 @@ export default defineConfig({
 ```ts
 export type Options {
   /**
-   * Whether to ask only once
+   * 是否仅询问一次
    * @default true
    */
   once?: boolean;
   /**
-   * Whether to get version on visibilitychange
+   * 是否在 visibilitychange 事件时获取版本号
    * @default true
    */
   onvisibilitychange?: boolean;
   /**
-   * Whether to get version when load chunk error
+   * 是否在加载模块错误时获取版本号
    * @default true
    */
   onerror?: boolean;
   /**
-   * Whether to poll to get version, and polling interval
-   * polling interval time unit: ms, default 1000 * 60 ms
+   * 是否通过轮询获取版本号，以及轮询间隔
+   * 轮询间隔时间单位：毫秒，默认 1000 * 60 毫秒
    * @default false
    */
   polling?: boolean | number;
