@@ -34,7 +34,7 @@ export default defineConfig({
 })
 ```
 
-## Options
+## 插件配置
 
 ```ts
 export type Options {
