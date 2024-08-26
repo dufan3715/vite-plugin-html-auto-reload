@@ -9,6 +9,14 @@
   "files": [
     "es"
   ],
+  "homepage": "https://github.com/dufan3715/vite-plugin-html-auto-reload",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dufan3715/vite-plugin-html-auto-reload.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dufan3715/vite-plugin-html-auto-reload/issues"
+  },
   "scripts": {
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
