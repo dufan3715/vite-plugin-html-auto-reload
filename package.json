@@ -1,13 +1,12 @@
 {
   "name": "vite-plugin-html-auto-reload",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "a vite plugin to build with version and do auto reload html on version change",
-  "type": "module",
-  "main": "",
-  "module": "es/index.js",
-  "types": "es/index.d.ts",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/esm/index.d.ts",
   "files": [
-    "es"
+    "dist"
   ],
   "homepage": "https://github.com/dufan3715/vite-plugin-html-auto-reload",
   "repository": {
@@ -18,7 +17,7 @@
     "url": "https://github.com/dufan3715/vite-plugin-html-auto-reload/issues"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --project tsconfig.json & tsc --project tsconfig.cjs.json",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
