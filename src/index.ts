@@ -59,10 +59,10 @@ const getScriptChildren = (
               // eslint-disable-next-line no-alert
               if (window.confirm('请求资源已更新，请刷新页面')) {
                 window.location.reload();
-              } else {
+              } ${once ? `else {
                 // eslint-disable-next-line no-use-before-define
                 removeEvent();
-              }
+              }` : ''}
             }
           });
       };
@@ -96,9 +96,8 @@ const getScriptChildren = (
         ${
           onvisibilitychange
             ? `document.addEventListener('visibilitychange', () => {
-          if (!document.hidden) {
-            checkHtmlVersion();
-          }
+          if (document.hidden) return;
+          checkHtmlVersion();
         });`
             : ''
         }

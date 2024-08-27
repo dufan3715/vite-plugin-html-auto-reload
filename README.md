@@ -61,3 +61,15 @@ export type Options {
   polling?: boolean | number;
 }
 ```
+
+## Server Configuration
+
+```nginx
+# nginx.conf
+
+location ~* \.(html|htm)$ {
+    add_header Cache-Control "no-cache, no-store, must-revalidate";
+    add_header Pragma "no-cache";
+    add_header Expires "0";
+}
+```
