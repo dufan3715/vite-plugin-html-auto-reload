@@ -139,7 +139,7 @@ const htmlAutoReload = (option: HtmlAutoReloadOption = {}): PluginOption => {
         },
       ];
     },
-    buildEnd() {
+    closeBundle() {
       const version = new Date().toISOString();
       const outputDir = path.resolve(config.build.outDir);
       const outputPath = path.join(outputDir, 'version.txt');
