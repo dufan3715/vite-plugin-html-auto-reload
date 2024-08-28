@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-html-auto-reload",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "a vite plugin to build with version and do auto reload html on version change",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -29,7 +29,9 @@
   "license": "MIT",
   "private": false,
   "dependencies": {
-    "@types/node": "^22.5.0",
+    "@types/node": "^22.5.0"
+  },
+  "peerDependencies": {
     "vite": "^5.4.2"
   }
 }
