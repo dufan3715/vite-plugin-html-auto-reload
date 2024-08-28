@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import { Plugin, ResolvedConfig } from 'vite';
+import { PluginOption, ResolvedConfig } from 'vite';
 import { writeFileSync } from 'fs';
 import path from 'path';
 
@@ -121,7 +121,7 @@ const getScriptChildren = (
   return `\n${funcStr}`;
 };
 
-const htmlAutoReload = (option: HtmlAutoReloadOption = {}): Plugin => {
+const htmlAutoReload = (option: HtmlAutoReloadOption = {}): PluginOption => {
   let config: ResolvedConfig;
   return {
     name: 'html-reload',
