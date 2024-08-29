@@ -3,6 +3,8 @@ import { PluginOption, ResolvedConfig } from 'vite';
 import { writeFileSync } from 'fs';
 import path from 'path';
 
+const version = new Date().toLocaleString();
+
 export type HtmlAutoReloadOption = {
   /**
    * Whether to ask only once
@@ -40,21 +42,16 @@ const getScriptChildren = (
   } = option;
   const ms = typeof polling === 'number' ? polling : 1000 * 60;
   const funcStr = `
-      let htmlVersion;
+      const localVersion = '${version}';
       ${once ? `let alreadyShowConfirm = false;` : ''}
       ${polling ? `let timer;` : ''}
-      const checkHtmlVersion = () => {
+      const checkVersion = () => {
+        ${once ? `if (alreadyShowConfirm) return;` : ''}
         const url = \`${versionUrl}?t=\${Date.now()}\`;
         fetch(url)
           .then(res => res.text())
-          .then(version => {
-            if (!version) return;
-            if (!htmlVersion) {
-              htmlVersion = version;
-              return;
-            }
-            ${once ? `if (alreadyShowConfirm) return;` : ''}
-            if (version !== htmlVersion) {
+          .then(remoteVersion => {
+            if (remoteVersion && remoteVersion !== localVersion) {
               ${once ? `alreadyShowConfirm = true;` : ''}
               // eslint-disable-next-line no-alert
               if (window.confirm('请求资源已更新，请刷新页面')) {
@@ -64,7 +61,7 @@ const getScriptChildren = (
                 removeEvent();
               }` : ''}
             }
-          });
+          })
       };
       ${
         onerror
@@ -74,7 +71,7 @@ const getScriptChildren = (
         if (error.message?.includes('Loading chunk') ||
             source instanceof HTMLScriptElement ||
             source instanceof HTMLLinkElement) {
-          checkHtmlVersion();
+          checkVersion();
         }
       }`
           : ''
@@ -82,7 +79,7 @@ const getScriptChildren = (
       function removeEvent() {
         ${
           onvisibilitychange
-            ? `document.removeEventListener('visibilitychange', checkHtmlVersion);`
+            ? `document.removeEventListener('visibilitychange', checkVersion);`
             : ''
         }
         ${
@@ -97,7 +94,7 @@ const getScriptChildren = (
           onvisibilitychange
             ? `document.addEventListener('visibilitychange', () => {
           if (document.hidden) return;
-          checkHtmlVersion();
+          checkVersion();
         });`
             : ''
         }
@@ -110,12 +107,11 @@ const getScriptChildren = (
           polling
             ? `timer = setInterval(() => {
             if (document.hidden) return;
-            checkHtmlVersion();
+            checkVersion();
           }, ${ms});`
             : ''
         }
       };
-      checkHtmlVersion();
       addEvent();
     `.replace(/^\s*[\r\n]/gm, '');
   return `\n${funcStr}`;
@@ -140,7 +136,6 @@ const htmlAutoReload = (option: HtmlAutoReloadOption = {}): PluginOption => {
       ];
     },
     closeBundle() {
-      const version = new Date().toISOString();
       const outputDir = path.resolve(config.build.outDir);
       const outputPath = path.join(outputDir, 'version.txt');
       writeFileSync(outputPath, version);
