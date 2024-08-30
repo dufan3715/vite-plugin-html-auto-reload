@@ -46,11 +46,11 @@ const getScriptChildren = (
       ${once ? `let alreadyShowConfirm = false;` : ''}
       ${polling ? `let timer;` : ''}
       const checkVersion = () => {
-        ${once ? `if (alreadyShowConfirm) return;` : ''}
         const url = \`${versionUrl}?t=\${Date.now()}\`;
         fetch(url)
           .then(res => res.text())
           .then(remoteVersion => {
+            ${once ? `if (alreadyShowConfirm) return;` : ''}
             if (remoteVersion && remoteVersion !== localVersion) {
               ${once ? `alreadyShowConfirm = true;` : ''}
               // eslint-disable-next-line no-alert
