@@ -46,12 +46,13 @@ const getScriptChildren = (
       ${once ? `let alreadyShowConfirm = false;` : ''}
       ${polling ? `let timer;` : ''}
       const checkVersion = () => {
+        ${once ? `if (alreadyShowConfirm) return;` : ''}
         const url = \`${versionUrl}?t=\${Date.now()}\`;
         fetch(url)
           .then(res => res.text())
           .then(remoteVersion => {
             ${once ? `if (alreadyShowConfirm) return;` : ''}
-            if (remoteVersion && remoteVersion !== localVersion) {
+            if (remoteVersion && remoteVersion.length === localVersion.length && remoteVersion !== localVersion) {
               ${once ? `alreadyShowConfirm = true;` : ''}
               // eslint-disable-next-line no-alert
               if (window.confirm('请求资源已更新，请刷新页面')) {
@@ -77,11 +78,6 @@ const getScriptChildren = (
           : ''
       }
       function removeEvent() {
-        ${
-          onvisibilitychange
-            ? `document.removeEventListener('visibilitychange', checkVersion);`
-            : ''
-        }
         ${
           onerror
             ? `window.removeEventListener('error', errorListener, true);`
