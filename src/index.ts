@@ -3,7 +3,16 @@ import { PluginOption, ResolvedConfig } from 'vite';
 import { writeFileSync } from 'fs';
 import path from 'path';
 
-const version = new Date().toLocaleString();
+const dateTimeFormatOptions: Intl.DateTimeFormatOptions = {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit'
+}
+
+const version = new Date().toLocaleString('en-US', dateTimeFormatOptions);
 
 export type HtmlAutoReloadOption = {
   /**
