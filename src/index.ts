@@ -36,6 +36,11 @@ export type HtmlAutoReloadOption = {
    * @default false
    */
   polling?: boolean | number;
+  /**
+   * Prompt content
+   * @default "请求资源已更新，请刷新页面"
+   */
+  promptContent?: string;
 };
 
 const getScriptChildren = (
@@ -48,26 +53,28 @@ const getScriptChildren = (
     onerror = true,
     once = true,
     polling = false,
+    promptContent = '请求资源已更新，请刷新页面'
   } = option;
   const ms = typeof polling === 'number' ? polling : 1000 * 60;
   const funcStr = `
+      /* eslint-disable */
       const localVersion = '${version}';
-      ${once ? `let alreadyShowConfirm = false;` : ''}
+      const key = \`__html_auto_reload_\${localVersion}__\`;
+      let confirmed = sessionStorage.getItem(key) === 'Y';
       ${polling ? `let timer;` : ''}
       const checkVersion = () => {
-        ${once ? `if (alreadyShowConfirm) return;` : ''}
+        if (confirmed) return;
         const url = \`${versionUrl}?t=\${Date.now()}\`;
         fetch(url)
           .then(res => res.text())
           .then(remoteVersion => {
-            ${once ? `if (alreadyShowConfirm) return;` : ''}
+            if (confirmed) return;
             if (remoteVersion && remoteVersion.length === localVersion.length && remoteVersion !== localVersion) {
-              ${once ? `alreadyShowConfirm = true;` : ''}
-              // eslint-disable-next-line no-alert
-              if (window.confirm('请求资源已更新，请刷新页面')) {
+              ${once ? `confirmed = true;` : ''}
+              sessionStorage.setItem(key, 'Y')
+              if (window.confirm('${promptContent}')) {
                 window.location.reload();
               } ${once ? `else {
-                // eslint-disable-next-line no-use-before-define
                 removeEvent();
               }` : ''}
             }

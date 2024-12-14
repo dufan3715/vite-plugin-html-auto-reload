@@ -59,6 +59,11 @@ export type Options {
    * @default false
    */
   polling?: boolean | number;
+  /**
+   * Prompt content
+   * @default "请求资源已更新，请刷新页面"
+   */
+  promptContent?: string;
 }
 ```
 
